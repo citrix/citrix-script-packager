@@ -1,0 +1,8 @@
+{
+    "packageId":"<%= packageId %>",
+    "packageName":"<%= packageName %>",
+    "packageDescription":"<%= packageDesc %>",
+    "version":"<%= packageVersion %>",
+    "author":"<%= packageAuthor %>",
+    "mainFile":"<%= mainFileToRun %>"
+}
