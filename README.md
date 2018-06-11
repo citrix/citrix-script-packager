@@ -12,6 +12,12 @@ npm install -g citrix-script-packager
 
 ## Usage
 
+To get the CLI help, execute
+
+```sh
+citrix-script-packager --help
+```
+
 This is created to help you do two basic items
 
 1. Start creating your script template

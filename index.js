@@ -9,60 +9,35 @@ const chalk = require('chalk');
 const yoenv = require('yeoman-environment');
 const jsonfile = require('jsonfile');
 const fse = require('fs-extra');
+var cmdr = require('commander');
+var package = require('./package.json');
 
 //read the manifest file
 const manifestFile = './manifest.json';
 var manifest = null;
 
-//create options object
-const optionsSpec = [
-    {
-        name: 'create',
-        type: Boolean,
-        defaultValue: false
-    },
-    {
-        name: 'syncmanifest',
-        type: Boolean,
-        defaultValue: false
-    },
-    {
-        name: 'package',
-        type: Boolean,
-        defaultValue: false
-    },
-    {
-        name: 'help',
-        alias: 'h',
-        type: Boolean,
-        defaultValue: true
-    },
-    {
-        name: "clean",
-        type: Boolean,
-        defaultValue: false
-    }
-];
+cmdr.version(package.version)
+.option('-c --create','Creates a new Citrix script package.')
+.option('-s --syncmanifest','Sync manifest file (without packaging) with the current template files. You may need to use this to force a sync.')
+.option('-d --clean','Clean the output directory of build assets.')
+.option('-p --package','Packup up the current template files into a VSIX file for use within the Citrix Developer extension.')
+.parse(process.argv);
 
 //build a yeoman environment
 var env = yoenv.createEnv();
+//console.log(cmdr.create);
+//return;
 
-var options = commandLineArgs(optionsSpec);
-
-if (!options.create && !options.help)
+if (!cmdr.create)
 {
     if ( fse.existsSync(manifestFile) )
     {
         manifest = jsonfile.readFileSync(manifestFile);
     }
-    else
-    {
-        console.log("It appears");
-    }
 }
 
 
-if ( options.package )
+if ( cmdr.package )
 {
     console.log(fs.existsSync(manifestFile));
     
@@ -72,11 +47,11 @@ if ( options.package )
     }
     else
     {
-        console.log("It appears");
+        console.log("manifest.json files doesn't exitst. Maybe you need to run 'citrix-script-packager --create'?");
         return;
     }
 }
-else if (options.syncmanifest)
+else if (cmdr.syncmanifest)
 {
     if ( fse.existsSync(manifestFile) )
     {
@@ -84,12 +59,12 @@ else if (options.syncmanifest)
     }
     else
     {
-        console.log("It appears");
+        console.log("manifest.json files doesn't exitst. Maybe you need to run 'citrix-script-packager --create'?");
         return;
     }
     
 }
-else if ( options.clean )
+else if ( cmdr.clean )
 {
     if ( fse.existsSync(manifestFile) )
     {
@@ -97,29 +72,16 @@ else if ( options.clean )
     }
     else
     {
-        console.log("It appears");
+        console.log("manifest.json files doesn't exitst. Maybe you need to run 'citrix-script-packager --create'?");
         return;
     }
     
 }
-// else if ( options.help )
-// {
-//     console.log('help'); 
-// }
-else if ( options.create )
+else if ( cmdr.create )
 {
-    if ( fs.existsSync(manifestFile) )
-    {
-        //create a template
-        env.register(require.resolve('./generators/index.js'),'citrix-create-scripttemplate');
-        env.run('citrix-create-scripttemplate');
-    }
-    else
-    {
-        console.log("It appears");
-        return;
-    }
-
+    //create a template
+    env.register(require.resolve('./generators/index.js'),'citrix-create-scripttemplate');
+    env.run('citrix-create-scripttemplate');
 }
 
 function createPackage()
@@ -136,7 +98,11 @@ function createPackage()
 }
 function clearOutputFiles(packageName)
 {    
+    console.log(chalk.yellow('removing the output directory and all sub directories and files...'));
     fse.removeSync('./output');
+    console.log(chalk.yellow('Complete removing output directory'));
+
+
 }
 function createZip()
 {   
@@ -200,7 +166,9 @@ function createZip()
 
 function renameFileToVSIX(packageName)
 {
-    fs.renameSync(`./output/${packageName}.zip`,`./output/${packageName}.vsix`)
+    console.log(chalk.yellow('removing the output directory and all sub directories and files...'));
+    fs.renameSync(`./output/${packageName}.zip`,`./output/${packageName}.vsix`);
+    console.log(chalk.yellow('Complete removing output directory'));
 }
 
 function syncManifest()

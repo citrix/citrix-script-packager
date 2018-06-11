@@ -1,6 +1,6 @@
 {
   "name": "citrix-script-packager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A script packager for the Citrix Developer Visual Studio Code extension.",
   "bin": {
     "citrix-script-packager": "./index.js"
@@ -11,6 +11,7 @@
     "archiver": "^2.1.1",
     "chalk": "^2.4.1",
     "command-line-args": "^5.0.2",
+    "commander": "^2.15.1",
     "fs-extra": "^6.0.1",
     "json-query": "^2.2.2",
     "jsonfile": "^4.0.0",
