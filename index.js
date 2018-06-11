@@ -4,7 +4,6 @@ const fs = require('fs');
 const archiver = require('archiver');
 const walk = require('walk');
 const jsonquery = require('json-query');
-const commandLineArgs = require('command-line-args');
 const chalk = require('chalk');
 const yoenv = require('yeoman-environment');
 const jsonfile = require('jsonfile');
