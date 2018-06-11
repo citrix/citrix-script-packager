@@ -34,7 +34,8 @@ const optionsSpec = [
     {
         name: 'help',
         alias: 'h',
-        type: Boolean
+        type: Boolean,
+        defaultValue: true
     },
     {
         name: "clean",
@@ -48,33 +49,77 @@ var env = yoenv.createEnv();
 
 var options = commandLineArgs(optionsSpec);
 
-if (!options.create )
+if (!options.create && !options.help)
 {
-    manifest = jsonfile.readFileSync(manifestFile);
+    if ( fse.existsSync(manifestFile) )
+    {
+        manifest = jsonfile.readFileSync(manifestFile);
+    }
+    else
+    {
+        console.log("It appears");
+    }
 }
 
 
 if ( options.package )
 {
-    createPackage();
+    console.log(fs.existsSync(manifestFile));
+    
+    if ( fse.existsSync(manifestFile) )
+    {
+        createPackage();
+    }
+    else
+    {
+        console.log("It appears");
+        return;
+    }
 }
 else if (options.syncmanifest)
 {
-    syncManifest();
+    if ( fse.existsSync(manifestFile) )
+    {
+        syncManifest();
+    }
+    else
+    {
+        console.log("It appears");
+        return;
+    }
+    
 }
 else if ( options.clean )
 {
-    clearOutputFiles(manifest.packageName);
+    if ( fse.existsSync(manifestFile) )
+    {
+        clearOutputFiles(manifest.packageName);
+    }
+    else
+    {
+        console.log("It appears");
+        return;
+    }
+    
 }
-else if ( options.help )
-{
-    console.log('help'); 
-}
+// else if ( options.help )
+// {
+//     console.log('help'); 
+// }
 else if ( options.create )
 {
-    //create a template
-    env.register(require.resolve('./generators/index.js'),'citrix-create-scripttemplate');
-    env.run('citrix-create-scripttemplate');
+    if ( fs.existsSync(manifestFile) )
+    {
+        //create a template
+        env.register(require.resolve('./generators/index.js'),'citrix-create-scripttemplate');
+        env.run('citrix-create-scripttemplate');
+    }
+    else
+    {
+        console.log("It appears");
+        return;
+    }
+
 }
 
 function createPackage()
