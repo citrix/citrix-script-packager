@@ -83,7 +83,7 @@ module.exports = class extends yeoman
         {
             this.fs.copy(
                 this.templatePath('base.ps1'),
-                this.destinationPath(`.packages/${this.packageName}/example.ps1`)
+                this.destinationPath(`packages/${this.packageName}/example.ps1`)
             );
         }
        
