@@ -24,7 +24,7 @@ module.exports = class extends yeoman
             {
                 type: 'input',
                 name: 'packageVersion',
-                message: 'Enter the the version of this package (ex: 1.0.0)'
+                message: 'Enter the version of this package (ex: 1.0.0)'
             },
             {
                 type: 'input',
