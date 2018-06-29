@@ -1,6 +1,6 @@
 {
   "name": "citrix-script-packager",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A script packager for the Citrix Developer Visual Studio Code extension.",
   "bin": {
     "citrix-script-packager": "./index.js"
@@ -18,6 +18,6 @@
     "make-dir": "^1.3.0",
     "walk": "^2.3.13",
     "yeoman-environment": "^2.2.0",
-    "yeoman-generator":"^2.0.5"
+    "yeoman-generator": "^2.0.5"
   }
 }
