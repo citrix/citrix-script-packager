@@ -9,27 +9,32 @@ module.exports = class extends yeoman
             {
                 type: 'input',
                 name: 'packageId',
-                message: 'Enter the package ID (ex: citrix.powershell.pvs)'
+                message: 'Enter the package ID (ex: citrix.powershell.pvs)',
+                default: `change.me.${this.appname}`
             },
             {
                 type: 'input',
                 name: 'packageName',
-                message: 'Enter the friendly package name (ex: pvs)'
+                message: 'Enter the friendly package name (ex: pvs)',
+                default: this.appname
             },
             {
                 type: 'input',
                 name: 'packageDesc',
-                message: 'Enter a description of the package you are building'
+                message: 'Enter a description of the package you are building',
+                default: 'A script package (you should change this!)'
             },
             {
                 type: 'input',
                 name: 'packageVersion',
-                message: 'Enter the version of this package (ex: 1.0.0)'
+                message: 'Enter the version of this package (ex: 1.0.0)',
+                default: '1.0.0'
             },
             {
                 type: 'input',
                 name: 'packageAuthor',
-                message: 'Enter the author of this package'
+                message: 'Enter the author of this package',
+                store: true
             },
             {
                 type: 'input',
