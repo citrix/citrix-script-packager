@@ -2,8 +2,6 @@
 const admZip = require('adm-zip');
 const fs = require('fs');
 const archiver = require('archiver');
-const walk = require('walk');
-const jsonquery = require('json-query');
 const chalk = require('chalk');
 const yoenv = require('yeoman-environment');
 const jsonfile = require('jsonfile');
@@ -17,15 +15,12 @@ var manifest = null;
 
 cmdr.version(package.version)
 .option('-c --create','Creates a new Citrix script package.')
-.option('-s --syncmanifest','Sync manifest file (without packaging) with the current template files. You may need to use this to force a sync.')
-.option('-d --clean','Clean the output directory of build assets.')
+.option('-r --clean','Clean the output directory of build assets.')
 .option('-p --package','Packup up the current template files into a VSIX file for use within the Citrix Developer extension.')
 .parse(process.argv);
 
 //build a yeoman environment
 var env = yoenv.createEnv();
-//console.log(cmdr.create);
-//return;
 
 if (!cmdr.create)
 {
@@ -35,11 +30,8 @@ if (!cmdr.create)
     }
 }
 
-
 if ( cmdr.package )
 {
-    console.log(fs.existsSync(manifestFile));
-    
     if ( fse.existsSync(manifestFile) )
     {
         createPackage();
@@ -49,19 +41,6 @@ if ( cmdr.package )
         console.log("manifest.json files doesn't exitst. Maybe you need to run 'citrix-script-packager --create'?");
         return;
     }
-}
-else if (cmdr.syncmanifest)
-{
-    if ( fse.existsSync(manifestFile) )
-    {
-        syncManifest();
-    }
-    else
-    {
-        console.log("manifest.json files doesn't exitst. Maybe you need to run 'citrix-script-packager --create'?");
-        return;
-    }
-    
 }
 else if ( cmdr.clean )
 {
@@ -73,8 +52,7 @@ else if ( cmdr.clean )
     {
         console.log("manifest.json files doesn't exitst. Maybe you need to run 'citrix-script-packager --create'?");
         return;
-    }
-    
+    } 
 }
 else if ( cmdr.create )
 {
@@ -89,26 +67,16 @@ function createPackage()
     console.log(chalk.yellow('Cleaning existing build assets'));
     clearOutputFiles(manifest.packageName);
 
-    console.log(chalk.yellow('Syncing manifest...'));
-    syncManifest();
-    console.log(chalk.yellow('Done...'));
-
     createZip();
 }
 function clearOutputFiles(packageName)
 {    
     console.log(chalk.yellow('removing the output directory and all sub directories and files...'));
     fse.removeSync('./output');
-    console.log(chalk.yellow('Complete removing output directory'));
-
-
+    console.log(chalk.yellow('Completed removing output directory'));
 }
 function createZip()
 {   
-    // //read the manifest file
-    // var manifestFile = './manifest.json';
-    // var manifest = jsonfile.readFileSync(manifestFile);
-
     //create the dir
     fs.mkdirSync('./output/');
 
@@ -132,25 +100,17 @@ function createZip()
 
     console.log(chalk.yellow('Reading templates directory'));
     
-    var files = fs.readdirSync('./packages');
-    files.forEach(file => {
-        var stats = fs.statSync(`./packages/${file}`)
-        if ( stats.isDirectory() )
-        {
-            console.log(chalk.green(`Adding the ${file} to the package`));
-            archive.directory(`packages/${file}/`);
-        }
-    });
+    console.log(chalk.green(`Adding the files and directories under the 'packages' root directory to the package`));
+    //adding the zip archive using the glob feature. This also lets us
+    //configure which files do not get added to the archive.
+    archive.glob('./packages/**', { ignore: '.*'});
 
-    syncManifest
-    
     //add the updated manifest.json file into the zip file
     console.log(chalk.yellow('Adding updated manifest file to the package.'));
     archive.file('./manifest.json', {name: `/packages/${manifest.packageName}/manifest.json`})
 
     console.log(chalk.yellow('Adding README file to the package.'));
     archive.file('./README.md', {name: `/packages/${manifest.packageName}/README.md`})
-
 
     archive.finalize();
 
@@ -159,68 +119,12 @@ function createZip()
 
     console.log(chalk.green(`Created ./output/${manifest.packageName}.vsix`));
     
-    console.log(chalk.green(`\nThe package is now ready to use in the Citrix VSCode extension.`));
-    
+    console.log(chalk.green(`\nThe package is now ready to use in the Citrix VSCode extension.`)); 
 }
 
 function renameFileToVSIX(packageName)
 {
-    console.log(chalk.yellow('removing the output directory and all sub directories and files...'));
+    console.log(chalk.yellow(`Renaming ${packageName}.zip to ${packageName}.vsix`));
     fs.renameSync(`./output/${packageName}.zip`,`./output/${packageName}.vsix`);
-    console.log(chalk.yellow('Complete removing output directory'));
+    console.log(chalk.yellow('Completed renaming'));
 }
-
-function syncManifest()
-{
-    //loop through all files to add to the manifest file
-    console.log(chalk.yellow('Adding untracked files to the manifest json file.'));
-    
-    walker = walk.walk('./packages/', null);
-    walker.on("file", function (root, fileStats, next) {
-        var queryResult = jsonquery(`files[name=${fileStats.name}].name`, {data: manifest});
-        
-        if ( queryResult.value === null )
-        {
-            fileInfo = {};
-            fileInfo.name = fileStats.name;
-            fileInfo.description = '[Fill out this description to help users understand what your script does]';
-            if ( !manifest.hasOwnProperty('files'))
-            {
-                manifest.files = [];
-            }
-            manifest.files.push(fileInfo);
-            console.log(chalk.green(`Added file ${fileStats.name} to manifest`));
-        }
-        next();
-    });
-    //when the process is done traversing the directories and files it will 
-    walker.on("end", () => {
-        if ( manifest.hasOwnProperty('files'))
-        {
-            var templateDir = fs.readdirSync('./packages/');
-            templateDir.forEach(dir => {
-                manifest.files.forEach(file => {
-                    var exists = fs.existsSync(`./packages/${dir}/${file.name}`);
-                    if ( !exists )
-                    {
-                        console.log(chalk.red(`Removing ${file.name} from the manifest since it doesn't exist on disk`));
-                        manifest.files.splice(file,1);
-                    }
-                });
-            });
-        }
-        // console.log(chalk.yellow('Writing updated manifest file to disk'));
-        fs.writeFile("./manifest.json", JSON.stringify(manifest,null,2), (err) => {
-            if ( err )
-            {
-                console.log(chalk.red(err));
-            }
-        });
-    });
-
-
-    
-    
-    
-}
-
