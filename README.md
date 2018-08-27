@@ -7,7 +7,7 @@ This project is an npm global tool that help developers package up their scripts
 We distribute this tool using npm. To install this in your environment, execute the following command
 
 ```sh
-npm install -g citrix-script-packager
+npm install -g citrix-scripts
 ```
 
 ## Usage
@@ -15,14 +15,16 @@ npm install -g citrix-script-packager
 To get the CLI help, execute
 
 ```sh
-citrix-script-packager --help
+citrix-scripts --help
 ```
 
-This is created to help you do two basic items
+This is created to help you do a few basic items.
 
 1. Start creating your script template
 
 2. Package up your template into a .vsix file for use with the Citrix Developer extension.
+
+3. Create a feed for use with the [Citrix Developer Extension for Visual Studio Code.](https://marketplace.visualstudio.com/items?itemName=CitrixDeveloper.citrixdeveloper-vscode)
 
 ## Getting Started
 
@@ -31,7 +33,7 @@ This is created to help you do two basic items
 The easiest way to start creating a script package is to run the following command
 
 ```sh
-citrix-script-packager --create
+citrix-scripts create
 ```
 
 This will prompt you for a few items and then create your base template layout. PLease note the friendly name that you enter, you will use this later.
@@ -41,10 +43,34 @@ This will prompt you for a few items and then create your base template layout. 
 Once you have your template all set, copied the correct script files into the friendly name location, you will need to package it up to be used within the Citrix Developer extension. You can do this with the following command
 
 ```sh
-citrix-script-packager --package
+citrix-scripts package
 ```
 
 This will create a .vsix file that can then be shared with the community and imported into the Citrix Developer extension.
+
+### Creating an RSS feed
+
+This helps you to aggregate all of your script packages that can be consumed by the Citrix Developer Extension.
+
+```sh
+citrix-scripts feed --directory [] --baseurl [url] --github
+```
+
+Let's break down the options here that you will need in order to create the RSS feed.
+
+* --directory
+    
+    The --directory option allows you to specify a location where your .vsix files are located. This can be anywhere on your computer as the script will traverse from the location you give recursivly to find all .vsix files and copy them into a vsixfeed directory.
+     
+* --baseurl
+
+    The --baseurl option if the site url where your feed.rss file will be hosted. This can be a webserver you maintain (http://www.mydomain/com/) or a file share on a network share (file:///myvisxfiles/company/) or hosted on a github url (https://www.github.com/johnmcbride/reponame)
+
+* --github
+
+    Thes github option is to be used if you are hosting the feed.rss file on a github repo. This will append '?raw=true' to the end of the link url. This is to help with downloading the binary package.
+
+
 
 ## Contributing
 
