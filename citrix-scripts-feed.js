@@ -136,7 +136,7 @@ recursive(path.resolve(program.directory))
     switch (feedUrl.protocol.toLowerCase()) 
     {
         case 'file:':
-            console.log(chalk.green(`feed is available at ${feedUrl.protocol}//${feedUrl.host}/${path.resolve('feed.rss')}`));
+            console.log(chalk.green(`feed is available at ${feedUrl.protocol}//${feedUrl.host}/${path.resolve('./vsixfeed/feed.rss')}`));
             break;
         case 'http:':
             console.log(chalk.green(`feed is available at ${feedUrl.protocol}//${feedUrl.host}/vsixfeed/feed.rss`));
